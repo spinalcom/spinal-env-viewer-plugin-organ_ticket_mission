@@ -24,121 +24,133 @@ with this file. If not, see
 
 <template>
   <v-card class="spinal-setup-organ-body">
-    <v-toolbar dense
-               dark>
-      <v-btn icon
-             @click="back">
-        <v-icon>
-          arrow_back
-        </v-icon>
-      </v-btn>
-      <v-toolbar-title>Setup organ mission</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon
-             @click="save">
-        <v-icon>check</v-icon>
-      </v-btn>
-    </v-toolbar>
+    <set-up-toolbar
+      title="Setup Context's equipment to send to Mission"
+      @back="back"
+      @save="save"
+    />
 
     <v-card-text class="spinal-setup-organ-container">
       <form action="none">
         <md-field>
           <label for="Select Spatial Context">select the Organ</label>
-          <md-select id="modelselect"
-                     v-model="selectedOrgan"
-                     name="modelselect"
-                     md-dense>
-            <md-option v-for="organCfg in organsCfg"
-                       :key="organCfg.id"
-                       :value="organCfg.id">
+          <md-select
+            id="modelselect"
+            v-model="selectedOrgan"
+            name="modelselect"
+            md-dense
+          >
+            <md-option
+              v-for="organCfg in organsCfg"
+              :key="organCfg.id"
+              :value="organCfg.id"
+            >
               {{ organCfg.name }}
             </md-option>
           </md-select>
         </md-field>
         <template v-if="selectedOrgan">
           <md-field>
-            <label for="Select Spatial Context">Select the Spatial
-              Context</label>
-            <md-select id="modelselect"
-                       v-model="selectedSpatialContext"
-                       name="modelselect"
-                       md-dense>
-              <md-optgroup v-if="spatialContexts.length > 0"
-                           label="Spatial contexts">
-                <md-option v-for="context in spatialContexts"
-                           :key="context.id"
-                           :value="context.id">
+            <label for="Select Spatial Context"
+              >Select the Spatial Context</label
+            >
+            <md-select
+              id="modelselect"
+              v-model="selectedSpatialContext"
+              name="modelselect"
+              md-dense
+            >
+              <md-optgroup
+                v-if="spatialContexts.length > 0"
+                label="Spatial contexts"
+              >
+                <md-option
+                  v-for="context in spatialContexts"
+                  :key="context.id"
+                  :value="context.id"
+                >
                   {{ context.name }}
                 </md-option>
               </md-optgroup>
 
-              <md-optgroup v-if="contexts.length > 0"
-                           label="Other contexts">
-                <md-option v-for="context in contexts"
-                           :key="context.id"
-                           :value="context.id">
+              <md-optgroup v-if="contexts.length > 0" label="Other contexts">
+                <md-option
+                  v-for="context in contexts"
+                  :key="context.id"
+                  :value="context.id"
+                >
                   {{ context.name }}
                 </md-option>
               </md-optgroup>
             </md-select>
           </md-field>
-          <v-text-field v-model="apiLogin"
-                        placeholder="Api Login"
-                        autocomplete="off"
-                        label="Mission Api Login" />
+          <v-text-field
+            v-model="apiLogin"
+            placeholder="Api Login"
+            autocomplete="off"
+            label="Mission Api Login"
+          />
 
-          <v-text-field v-model="apiPassword"
-                        autocomplete="off"
-                        placeholder="Api Password"
-                        label="Mission Api Password"
-                        :append-icon="showApiPassword ? 'visibility' : 'visibility_off'"
-                        :type="showApiPassword ? 'text' : 'password'"
-                        @click:append="showApiPassword = !showApiPassword" />
+          <v-text-field
+            v-model="apiPassword"
+            autocomplete="off"
+            placeholder="Api Password"
+            label="Mission Api Password"
+            :append-icon="showApiPassword ? 'visibility' : 'visibility_off'"
+            :type="showApiPassword ? 'text' : 'password'"
+            @click:append="showApiPassword = !showApiPassword"
+          />
 
-          <v-text-field v-model="appelant"
-                        placeholder="Api Appelant"
-                        autocomplete="off"
-                        label="Mission Api Appelant" />
+          <v-text-field
+            v-model="appelant"
+            placeholder="Api Appelant"
+            autocomplete="off"
+            label="Mission Api Appelant"
+          />
 
-          <v-text-field v-model="prefixBuilding"
-                        placeholder="Mission Prefix Building"
-                        autocomplete="off"
-                        label="Mission Prefix Building" />
+          <v-text-field
+            v-model="prefixBuilding"
+            placeholder="Mission Prefix Building"
+            autocomplete="off"
+            label="Mission Prefix Building"
+          />
 
-          <v-text-field v-model="pullInterval"
-                        placeholder="Interval to pull data from Mission"
-                        type="number"
-                        label="Interval to pull data from Mission in ms" />
-          <VueCtkDateTimePicker v-model="lastSyncCompu"
-                                :dark="true"
-                                :max-date="today"
-                                label="Last Synchonization">
-          </VueCtkDateTimePicker>
+          <v-text-field
+            v-model="pullInterval"
+            placeholder="Interval to pull data from Mission"
+            type="number"
+            label="Interval to pull data from Mission in ms"
+          />
+          <VueCtkDateTimePicker
+            v-model="lastSyncCompu"
+            :dark="true"
+            :max-date="today"
+            label="Last Synchonization"
+          />
         </template>
       </form>
     </v-card-text>
-    <v-text-field v-model="appelant"
-                  placeholder="appelant"
-                  label="appelant" />
+    <v-text-field v-model="appelant" placeholder="appelant" label="appelant" />
   </v-card>
 </template>
-
-
 
 <script>
 import {
   SpinalGraphService,
-  SpinalNodePointer
+  SpinalNodePointer,
 } from "spinal-env-viewer-graph-service";
 import { FileSystem } from "spinal-core-connectorjs_type";
 import moment from "moment";
 import spinalEnvViewerContextGeographicService from "spinal-env-viewer-context-geographic-service";
+import SetUpToolbar from "./SetUpToolbar.vue";
+
 const CONTEXT_GEO_TYPE =
   spinalEnvViewerContextGeographicService.constants.CONTEXT_TYPE;
 export default {
   name: "SetUpSelectedOrgan",
+  components: { SetUpToolbar },
   props: {
-    contextId: { required: true, type: String }
+    contextId: { required: true, type: String },
   },
   data: function () {
     const today = new Date();
@@ -156,7 +168,7 @@ export default {
       pullInterval: 5 * 60 * 1000, // 5 min
       prefixBuilding: "",
       lastSync: NaN,
-      organsCfg: []
+      organsCfg: [],
       // selectedContextId: ""
     };
   },
@@ -171,8 +183,8 @@ export default {
       },
       set(value) {
         this.lastSync = moment.utc(value, "YYYY-MM-DD HH:mm:ss");
-      }
-    }
+      },
+    },
   },
   watch: {
     async selectedOrgan() {
@@ -186,7 +198,7 @@ export default {
       this.prefixBuilding = node.mission.prefixBuilding.get();
       this.lastSync = node.mission.lastSync.get();
       this.selectedSpatialContext = node.spatialContextID.get();
-    }
+    },
   },
   async mounted() {
     // eslint-disable-next-line no-undef
@@ -197,7 +209,7 @@ export default {
       this.organsCfg.push({
         name: file.name.get(),
         id: file._server_id,
-        ptr: file._ptr.data.value
+        ptr: file._ptr.data.value,
       });
       if (organ && organ._server_id === file._ptr.data.value) {
         this.selectedOrgan = file._server_id;
@@ -210,13 +222,13 @@ export default {
       if (itm.info.type.get() === CONTEXT_GEO_TYPE) {
         this.spatialContexts.push({
           id: itm.info.id.get(),
-          name: itm.info.name.get()
+          name: itm.info.name.get(),
         });
         return acc;
       }
       acc.push({
         id: itm.info.id.get(),
-        name: itm.info.name.get()
+        name: itm.info.name.get(),
       });
       return acc;
     }, []);
@@ -265,8 +277,8 @@ export default {
       organCfgModel.mission.prefixBuilding.set(this.prefixBuilding);
       organCfgModel.restart.set(true);
       this.$emit("close");
-    }
-  }
+    },
+  },
 };
 </script>
 

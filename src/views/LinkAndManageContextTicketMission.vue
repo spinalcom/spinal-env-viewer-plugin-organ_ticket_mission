@@ -23,116 +23,131 @@ with this file. If not, see
 -->
 
 <template>
-  <v-app dark
-         class="LinkAndManageContextTicketMission-body">
-    <setUpSelectedOrgan v-if="openSetup"
-                        :context-id="contextId"
-                        @close="onCloseSetup()"></setUpSelectedOrgan>
-    <v-card v-else
-            class="LinkAndManageContextTicketMission-card">
-      <v-toolbar class="LinkAndManageContextTicketMission-toolbar"
-                 dense
-                 dark>
+  <v-app dark class="LinkAndManageContextTicketMission-body">
+    <setUpSelectedOrgan
+      v-if="openSetup"
+      :context-id="contextId"
+      @close="onCloseSetup()"
+    />
+    <SetUpContextEquip
+      v-if="openSetupEquip"
+      :server-id="serverId"
+      @close="openSetupEquip = false"
+    />
+    <v-card v-else class="LinkAndManageContextTicketMission-card">
+      <v-toolbar class="LinkAndManageContextTicketMission-toolbar" dense dark>
         <v-toolbar-title> Status : {{ statusCompu }} </v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon
-               @click="openSetup=true">
+        <v-spacer />
+        <v-btn icon @click="openSetup = true">
           <v-icon>settings</v-icon>
         </v-btn>
 
-        <v-speed-dial v-model="fabBtn"
-                      direction="left"
-                      :open-on-hover="false">
-          <template v-slot:activator>
-            <v-btn v-model="fabBtn"
-                   color="blue"
-                   small
-                   fab>
+        <v-speed-dial v-model="fabBtn" direction="left" :open-on-hover="false">
+          <template #activator>
+            <v-btn v-model="fabBtn" color="blue" small fab>
               <v-icon>more_vert</v-icon>
               <v-icon>close</v-icon>
             </v-btn>
           </template>
 
-          <v-btn v-tooltip="runStopCompu"
-                 fab
-                 :disabled="disableBtn"
-                 small
-                 :color="runStopColorCompu"
-                 @click="runOrStop">
+          <v-btn
+            v-tooltip="runStopCompu"
+            fab
+            :disabled="disableBtn"
+            small
+            :color="runStopColorCompu"
+            @click="runOrStop"
+          >
             <v-icon>{{ runStopIconCompu }}</v-icon>
           </v-btn>
 
-          <v-btn v-tooltip="'Restart Organ'"
-                 fab
-                 :disabled="linked === false || restart === true"
-                 small
-                 color="red"
-                 @click="restartOrgan">
+          <v-btn
+            v-tooltip="'Restart Organ'"
+            fab
+            :disabled="linked === false || restart === true"
+            small
+            color="red"
+            @click="restartOrgan"
+          >
             <v-icon>refresh</v-icon>
           </v-btn>
 
-          <v-btn v-tooltip="'Synchonize Spatial context to Mission'"
-                 fab
-                 :disabled="disableBtn"
-                 small
-                 color="blue"
-                 @click="syncSpatialBtn">
+          <v-btn
+            v-tooltip="'Synchonize Spatial context to Mission'"
+            fab
+            :disabled="disableBtn"
+            small
+            color="blue"
+            @click="syncSpatialBtn"
+          >
             <v-icon>location_city</v-icon>
           </v-btn>
-          <v-btn v-tooltip="'Synchonize Mission\'s Process with this context'"
-                 fab
-                 :disabled="disableBtn"
-                 small
-                 color="blue"
-                 @click="syncProcessMission">
+          <v-btn
+            v-tooltip="'Synchonize Mission\'s Process with this context'"
+            fab
+            :disabled="disableBtn"
+            small
+            color="blue"
+            @click="syncProcessMission"
+          >
             <v-icon>assignment_returned</v-icon>
           </v-btn>
 
-          <!-- <v-btn v-tooltip="'Synchonize Spatial Equipment'"
-                 fab
-                 :disabled="disableBtn"
-                 small
-                 color="blue"
-                 @click="syncProcessMission">
+          <v-btn
+            v-tooltip="'Synchonize Spatial Equipment'"
+            fab
+            :disabled="disableBtn"
+            small
+            color="blue"
+            @click="openSetupEquip = true"
+          >
             <v-icon>device_hub</v-icon>
-          </v-btn> -->
+          </v-btn>
         </v-speed-dial>
       </v-toolbar>
       <v-card-text class="LinkAndManageContextTicketMission-card-container">
-        <md-empty-state :md-icon="statusIconCompu"
-                        :md-label="statusCompu"
-                        md-description="">
-          <md-button v-if="linked === false"
-                     class="md-primary md-raised"
-                     @click="openSetup=true">
+        <md-empty-state
+          :md-icon="statusIconCompu"
+          :md-label="statusCompu"
+          md-description=""
+        >
+          <md-button
+            v-if="linked === false"
+            class="md-primary md-raised"
+            @click="openSetup = true"
+          >
             Click here for Setup
           </md-button>
         </md-empty-state>
       </v-card-text>
     </v-card>
-    <v-progress-linear v-if="spin"
-                       style="margin:0;"
-                       class="spinal-modal-progress-bar"
-                       :indeterminate="true"
-                       color="primary" />
+    <v-progress-linear
+      v-if="spin"
+      style="margin: 0"
+      class="spinal-modal-progress-bar"
+      :indeterminate="true"
+      color="primary"
+    />
   </v-app>
 </template>
 
 <script>
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import SetUpSelectedOrgan from "./SetUpSelectedOrgan.vue";
+import SetUpContextEquip from "./SetUpContextEquip.vue";
 export default {
   name: "LinkAndManageContextTicketMission",
-  components: { SetUpSelectedOrgan },
+  components: { SetUpSelectedOrgan, SetUpContextEquip },
   data: function () {
     return {
       openSetup: false,
+      openSetupEquip: false,
       contextId: "",
       linked: false,
       status: -1,
       serverId: 0,
       restart: false,
-      fabBtn: false
+      fabBtn: false,
     };
   },
   computed: {
@@ -155,7 +170,6 @@ export default {
       }
     },
     statusIconCompu() {
-      console.log("statusIconCompu", this.status);
       if (this.linked === false) return "settings";
       if (this.restart === true) return "refresh";
       switch (this.status) {
@@ -197,7 +211,7 @@ export default {
     runStopColorCompu() {
       if (this.linked === true && this.status === 3) return "red";
       return "green";
-    }
+    },
   },
   mounted() {},
   methods: {
@@ -212,6 +226,7 @@ export default {
         const unbind = element.bind(() => {
           if (this) {
             this.status = element.mission.organStatus.get();
+            console.log("this.status", this.status);
             this.linked = true;
             this.serverId = element._server_id;
             this.restart = element.restart.get();
@@ -256,6 +271,7 @@ export default {
       const element = await node.element.load();
       element.mission.organStatus.set(2);
     },
+    syncEquipMission() {},
     start() {},
     async onCloseSetup() {
       this.openSetup = false;
@@ -272,8 +288,8 @@ export default {
     },
     removed() {},
     close() {},
-    closeDialog() {}
-  }
+    closeDialog() {},
+  },
 };
 </script>
 
@@ -311,6 +327,17 @@ export default {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+.LinkAndManageContextTicketMission-body .v-btn--floating .v-btn__content {
+  height: unset;
+}
+
+.LinkAndManageContextTicketMission-body
+  .v-btn--floating
+  .v-btn__content
+  > :not(:only-child):first-child,
+.v-btn--floating .v-btn__content > :not(:only-child):last-child {
+  top: unset;
 }
 
 .LinkAndManageContextTicketMission-toolbar .v-speed-dial__list > div {
