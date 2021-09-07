@@ -24,15 +24,15 @@ with this file. If not, see
 
 <template>
   <v-app dark class="LinkAndManageContextTicketMission-body">
-    <setUpSelectedOrgan
-      v-if="openSetup"
-      :context-id="contextId"
-      @close="onCloseSetup()"
-    />
     <SetUpContextEquip
       v-if="openSetupEquip"
       :server-id="serverId"
       @close="openSetupEquip = false"
+    />
+    <setUpSelectedOrgan
+      v-else-if="openSetup"
+      :context-id="contextId"
+      @close="onCloseSetup()"
     />
     <v-card v-else class="LinkAndManageContextTicketMission-card">
       <v-toolbar class="LinkAndManageContextTicketMission-toolbar" dense dark>
@@ -132,17 +132,17 @@ with this file. If not, see
 </template>
 
 <script>
-import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import SetUpSelectedOrgan from "./SetUpSelectedOrgan.vue";
-import SetUpContextEquip from "./SetUpContextEquip.vue";
+import { SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import SetUpSelectedOrgan from './SetUpSelectedOrgan.vue';
+import SetUpContextEquip from './SetUpContextEquip.vue';
 export default {
-  name: "LinkAndManageContextTicketMission",
+  name: 'LinkAndManageContextTicketMission',
   components: { SetUpSelectedOrgan, SetUpContextEquip },
   data: function () {
     return {
       openSetup: false,
       openSetupEquip: false,
-      contextId: "",
+      contextId: '',
       linked: false,
       status: -1,
       serverId: 0,
@@ -152,39 +152,39 @@ export default {
   },
   computed: {
     statusCompu() {
-      if (this.linked === false) return "Not linked";
-      if (this.restart === true) return "Restarting";
+      if (this.linked === false) return 'Not linked';
+      if (this.restart === true) return 'Restarting';
       switch (this.status) {
         case 0:
-          return "Stand By";
+          return 'Stand By';
         case 1:
-          return "Sync spatial";
+          return 'Sync spatial';
         case 2:
-          return "Sync process";
+          return 'Sync process';
         case 3:
-          return "Running";
+          return 'Running';
         case 4:
-          return "Sync Equipments";
+          return 'Sync Equipments';
         default:
-          return "Stand By";
+          return 'Stand By';
       }
     },
     statusIconCompu() {
-      if (this.linked === false) return "settings";
-      if (this.restart === true) return "refresh";
+      if (this.linked === false) return 'settings';
+      if (this.restart === true) return 'refresh';
       switch (this.status) {
         case 0:
-          return "done";
+          return 'done';
         case 1:
-          return "location_city";
+          return 'location_city';
         case 2:
-          return "assignment_returned";
+          return 'assignment_returned';
         case 3:
-          return "play_arrow";
+          return 'play_arrow';
         case 4:
-          return "device_hub";
+          return 'device_hub';
         default:
-          return "done";
+          return 'done';
       }
     },
 
@@ -201,16 +201,16 @@ export default {
       return true;
     },
     runStopCompu() {
-      if (this.linked === true && this.status === 3) return "Stop";
-      return "Run";
+      if (this.linked === true && this.status === 3) return 'Stop';
+      return 'Run';
     },
     runStopIconCompu() {
-      if (this.linked === true && this.status === 3) return "pause";
-      return "play_arrow";
+      if (this.linked === true && this.status === 3) return 'pause';
+      return 'play_arrow';
     },
     runStopColorCompu() {
-      if (this.linked === true && this.status === 3) return "red";
-      return "green";
+      if (this.linked === true && this.status === 3) return 'red';
+      return 'green';
     },
   },
   mounted() {},
@@ -226,7 +226,7 @@ export default {
         const unbind = element.bind(() => {
           if (this) {
             this.status = element.mission.organStatus.get();
-            console.log("this.status", this.status);
+            console.log('this.status', this.status);
             this.linked = true;
             this.serverId = element._server_id;
             this.restart = element.restart.get();
@@ -278,7 +278,7 @@ export default {
       await this.getLinkedOrgan();
     },
     async opened(data) {
-      console.log("opened", data);
+      console.log('opened', data);
       this.contextId = data;
       this.status = -1;
       this.linked = false;
